@@ -1,5 +1,5 @@
 #pragma once
-#include <algorithm>  // Для shuffle()
+#include <algorithm>  // for shuffle()
 #include <random> 
 
 std::random_device rd;

@@ -1,11 +1,31 @@
 #include <iostream>
 #include "shuffle.h"
 #include "deck.h"
+#include "dealer.h"
 
 const int DIM = 21;
 int isGameOver = 0;
 
 std::vector<std::pair<std::string, std::string>> myCards = {};
+std::vector<std::pair<std::string, std::string>> dealerCards = {};
+
+void drawCards(bool revealAll){
+     std::cout << "Dealer have: \n";
+     for (size_t i = 0; i < dealerCards.size(); i++) {
+        if (i == 0 && !revealAll) {
+            std::cout << "[Hidden] \n"; // first card is hidden
+        } 
+        else {
+            std::cout << dealerCards[i].first << " " << dealerCards[i].second << " " << std::endl;
+        }
+     }
+     std::cout << std::endl;
+    
+     std::cout << "You have: \n";
+     for (auto x : myCards){ 
+          std::cout << x.first << ' ' << x.second << std::endl;
+     }
+}
 
 int mySum(){
      int pSum=0;
@@ -31,8 +51,8 @@ int mySum(){
 }
 
 void clearConsole() {
-     std::cout << "\033[2J\033[H"; // Очищення консолі через ANSI-коди
- }
+     std::cout << "\033[2J\033[H"; // clear console by ANSI-codes
+}
 
 void gameOver(int &isGameOver){
      isGameOver=1;
@@ -40,43 +60,41 @@ void gameOver(int &isGameOver){
 
 int main(){
      clearConsole();
-     // Тасуємо колоду
-     shuffle(deck);
 
-     myCards.push_back(deck[0]);
-     myCards.push_back(deck[1]);
-     int i=1;
+     shuffle(deck); // shuffle deck
+
+     dealer Dealer; // make a Dealer
+
+     myCards.push_back(deck[0]); // take 2 cards from deck
+     myCards.push_back(deck[2]);
+     dealerCards.push_back(deck[1]); // dealer takes 2 cards from deck
+     dealerCards.push_back(deck[3]);
+
+     int i=3;
      
      char decis;
 
      while (isGameOver==0){
           if (isGameOver==0) clearConsole();
-          
-          std::cout << "You have:" << std::endl;
-          for (auto x : myCards){
-               std::cout << x.first << ' ' << x.second << std::endl;
-          } 
-
+          drawCards(false);
           std::cout << "Pick up next card?(Y/n)" << std::endl;
           std::cin >> decis;
           
           if (decis == 'Y') {
                i++;
                myCards.push_back(deck[i]);
+               Dealer.decision();
           }
+
           else if (decis == 'n'){
                int sum = mySum();
-               if (sum > DIM) {
-                    std::cout << "YOU LOSE" << std::endl;
-                    return 0;
-               }
-               else if (sum <= DIM) {
-                    std::cout << "YOU WIN" << std::endl;
-                    return 0;
-               }
+                  
+               Dealer.decision();
           }
+
           else if (decis == 'e'){
                gameOver(isGameOver);
+               drawCards(true);
           }
      }
      return 0;     
