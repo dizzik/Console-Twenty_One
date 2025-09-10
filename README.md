@@ -5,7 +5,7 @@ You play against the **dealer**, who follows real Blackjack rules.
 
 ---
 
-## 🎮 Features
+## Features
 - Classic Blackjack rules:
   - Players are dealt two cards face-up, and the dealer gets one face-up and one face-down card.
   - Numbered cards are worth their face value, face cards (Jack, Queen, King) are worth 10, and Aces can be 1 or 11.
@@ -16,7 +16,7 @@ You play against the **dealer**, who follows real Blackjack rules.
 
 ---
 
-## 🛠️ Technologies
+## Technologies
 - **C++17** (works with later versions too).
 - Cross-platform (Windows, Linux, macOS).
 
