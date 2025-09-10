@@ -6,48 +6,56 @@
 const int DIM = 21;
 int isGameOver = 0;
 
-std::vector<std::pair<std::string, std::string>> myCards = {};
-std::vector<std::pair<std::string, std::string>> dealerCards = {};
+std::vector<std::pair<std::string, int>> myCards = {};
+std::vector<std::pair<std::string, int>> dealerCards = {};
 
 void drawCards(bool revealAll){
+     std::cout << "///////////////////////////////////////////\n";
      std::cout << "Dealer have: \n";
      for (size_t i = 0; i < dealerCards.size(); i++) {
         if (i == 0 && !revealAll) {
             std::cout << "[Hidden] \n"; // first card is hidden
         } 
         else {
-            std::cout << dealerCards[i].first << " " << dealerCards[i].second << " " << std::endl;
+            std::cout << dealerCards[i].first << " " << std::endl;
         }
      }
      std::cout << std::endl;
     
      std::cout << "You have: \n";
      for (auto x : myCards){ 
-          std::cout << x.first << ' ' << x.second << std::endl;
+          std::cout << x.first << std::endl;
      }
 }
 
 int mySum(){
-     int pSum=0;
+     int playerSum=0;
      for (auto x : myCards){
-          if (x.first == "2") pSum+=2;
-          if (x.first == "3") pSum+=3;
-          if (x.first == "4") pSum+=4;
-          if (x.first == "5") pSum+=5;
-          if (x.first == "6") pSum+=6;
-          if (x.first == "7") pSum+=7;
-          if (x.first == "8") pSum+=8;
-          if (x.first == "9") pSum+=9;
-          if (x.first == "10" || x.first == "Jack" || x.first == "Queen" || x.first == "King") pSum+=10;
-          if (x.first == "Ace"){
-               std::cout << "choose your Ace value: (1/10)" << std::endl;
+          playerSum+=x.second;
+          if (x.second == 0){
+               std::cout << "choose your Ace value: (1/11)" << std::endl;
                int val;
                std::cin>> val;
-               if (val == 1) pSum+=1;
-               else pSum+=10;
+               if (val == 1) playerSum+=1;
+               else playerSum+=11;
           }
      }
-     return pSum;
+     return playerSum;
+}
+int botSum(){
+     int res = 0; int aces = 0;
+     for (auto x : dealerCards){
+          res+=x.second;
+          if (x.second == 0){
+               aces++;
+               res+=11;
+          }
+     }
+     while (res > 21 && aces > 0){
+          res-=10;
+          aces--;
+     }
+     return res;
 }
 
 void clearConsole() {
@@ -58,12 +66,29 @@ void gameOver(int &isGameOver){
      isGameOver=1;
 }
 
+void winner(int& playerSum, int& dealerSum){
+     clearConsole();
+     gameOver(isGameOver);
+     if (playerSum <= 21 && dealerSum <= 21){
+          if (playerSum > dealerSum) std::cout << "YOU WIN!\n";
+          else if (dealerSum > playerSum) std::cout << "YOU LOSE\n";
+          else if (dealerSum == playerSum) std::cout << "DRAW\n";
+     }
+     else if (playerSum > 21 && dealerSum <= 21) std::cout << "YOU LOSE\n";
+     else if (playerSum <= 21 && dealerSum > 21) std::cout << "YOU WIN!\n";
+     else{
+          if (playerSum < dealerSum) std::cout << "YOU WIN!\n";
+          else if (playerSum > dealerSum) std::cout << "YOU LOSE\n";
+          else std::cout << "DRAW\n";
+     }    
+}
+
 int main(){
      clearConsole();
 
-     shuffle(deck); // shuffle deck
-
      dealer Dealer; // make a Dealer
+     
+     shuffle(deck); // shuffle deck
 
      myCards.push_back(deck[0]); // take 2 cards from deck
      myCards.push_back(deck[2]);
@@ -75,27 +100,30 @@ int main(){
      char decis;
 
      while (isGameOver==0){
-          if (isGameOver==0) clearConsole();
+          int playerSum = mySum();
+          int dealerSum = botSum();
           drawCards(false);
-          std::cout << "Pick up next card?(Y/n)" << std::endl;
+
+          std::cout << "Pick up next card?(y/n)" << std::endl;
           std::cin >> decis;
-          
-          if (decis == 'Y') {
+
+          if (decis == 'y') {
                i++;
                myCards.push_back(deck[i]);
-               Dealer.decision();
+               Dealer.decision(i, myCards, dealerCards, playerSum, true);
           }
 
           else if (decis == 'n'){
-               int sum = mySum();
-                  
-               Dealer.decision();
+               if (!Dealer.decision(i, myCards, dealerCards, playerSum, false)){
+                    winner(playerSum, dealerSum);
+               }
           }
 
           else if (decis == 'e'){
                gameOver(isGameOver);
                drawCards(true);
           }
+          if (isGameOver==0) clearConsole();
      }
      return 0;     
 }

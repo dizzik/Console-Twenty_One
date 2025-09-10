@@ -5,6 +5,6 @@
 std::random_device rd;
 std::mt19937 g(rd());
 
-void shuffle(std::vector<std::pair<std::string, std::string>>& deck){
+void shuffle(std::vector<std::pair<std::string, int>>& deck){
     std::shuffle(deck.begin(), deck.end(), g);
 }
